@@ -1,4 +1,4 @@
-using SATProject.UI.MVC.Models;
+﻿using SATProject.UI.MVC.Models;
 using SATProject.UI.MVC.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -17,7 +17,7 @@ namespace SATProject.UI.MVC.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -148,12 +148,19 @@ namespace SATProject.UI.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
-            {
+            if (ModelState.IsValid)            {               
+
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    //#region Dealing with custom user details
+                    //UserDetail newUserDeets = new UserDetail();
+                    //newUserDeets.UserID = user.Id; newUserDeets.FirstName = model.FirstName;
+                    //newUserDeets.LastName = model.LastName;
+                    //newUserDeets.ResumeFile = model.ResumeFile;//--TODO: handle file uploadFsdpEntities db = new FsdpEntities();db.UserDetails.Add(newUserDeets);db.SaveChanges();
+                    //#endregion
+
                     var code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
